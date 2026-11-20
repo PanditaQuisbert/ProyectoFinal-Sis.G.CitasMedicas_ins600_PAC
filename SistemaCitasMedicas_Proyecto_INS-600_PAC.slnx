@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SistemaCitasMedicas.Datos/SistemaCitasMedicas.Datos.csproj" />
+  <Project Path="SistemaCitasMedicas.Logica/SistemaCitasMedicas.Logica.csproj" />
+  <Project Path="SistemaCitasMedicas/SistemaCitasMedicas.csproj" />
+</Solution>

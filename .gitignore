@@ -1,0 +1,47 @@
+## .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.cache
+*.log
+TestResults/
+*.DotSettings.user
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+artifacts/
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+# NuGet v3
+project.lock.json
+project.fragment.lock.json
+
+## Node (Tailwind/build tooling)
+node_modules/
+
+## OS / misc
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Rider / VS Code local
+.idea/
+.vscode/*.code-workspace
+
+## ASP.NET publish outputs
+publish/
+*.Publish.xml
+
+## Local temp
+*.tmp
+*.temp
