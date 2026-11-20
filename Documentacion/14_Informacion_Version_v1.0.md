@@ -25,15 +25,22 @@ Versión inicial completa del sistema web según SRS, que incluye:
 - Paquetes NuGet relevantes: Entity Framework Core 10.0.15 (alineado), BCrypt.Net-Next 4.1.0
 
 ## 4. Estado de verificación (resumen)
-- Compilación: **0 errores, 0 advertencias**.
+- Compilación web: **0 errores, 0 advertencias** (`dotnet build SistemaCitasMedicas_Proyecto_INS-600_PAC.slnx`).
 - Pruebas funcionales del sistema (CP-01 a CP-10 y adicionales): **ejecutadas y aprobadas** en entorno de desarrollo contra SQL Server (ver `06_Resultados_de_Pruebas.md`).
 - Pruebas automatizadas (`dotnet test`): **no disponibles** (sin proyecto de tests en la solución).
-- Etiqueta Git: **`v1.0`** (a crear/registrar en el repositorio local de entrega según procedimiento documentado).
+- Control de versiones (Git local, rama `master`):
+  - `f6743ee` — feat(datos,logica): modelo EF Core, migraciones y servicios de negocio
+  - `c41c34b` — feat(web): autenticacion, controladores, vistas y modulos del sistema
+  - `c86e96c` — **(tag: v1.0)** docs: documentacion del proyecto, guias, pruebas y materiales de referencia
+  - `f05c55a` — feat(api): agrega API REST con autenticacion JWT para aplicacion movil (posterior a v1.0)
+  - `7cd21af` — feat(movil): implementa aplicacion Flutter y documentacion movil (posterior a v1.0)
+- App móvil: `flutter pub get`, `flutter analyze` (sin incidencias), `flutter build web` exitoso y verificación de endpoints API con backend activo (**COMPLETADO Y VERIFICADO** en entorno de desarrollo; ejecución en emulador/dispositivo Android físico: **PENDIENTE DE VERIFICACIÓN** por depender del entorno del evaluador).
 
 ## 5. Entregables asociados
-- Código fuente completo (3 capas), migraciones y configuración.
-- Documentación: SRS (original), arquitectura, base de datos/diccionario, plan y resultados de pruebas, manuales, seguridad, COCOMO, registro de cambios, guías de ejecución y demostración, planificación.
-- Aplicación móvil independiente: entregable separado (ver carpeta/documentación correspondiente).
+- Código fuente completo del sistema web (3 capas), API REST/JWT para integración móvil, migraciones y configuración.
+- Aplicación móvil independiente Flutter (`SistemaCitasMedicas.Movil`), separada del proyecto web y consumiendo la API (sin acceso directo a SQL Server).
+- Documentación: SRS (original), arquitectura, base de datos/diccionario, plan y resultados de pruebas, manuales, seguridad, COCOMO, registro de cambios, guías de ejecución y demostración, planificación y documentación de app móvil.
+- Respaldo inicial y estructura de entrega organizada con ZIP final verificable.
 
 ## 6. Limitaciones conocidas
 - Exportación PDF mediante vista imprimible del navegador (sin librería PDF embebida); exportación Excel como CSV.
