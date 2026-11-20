@@ -1,0 +1,185 @@
+﻿@using SistemaCitasMedicas.Datos.Entidades
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var nombreCompleto = User.FindFirst("NombreCompleto")?.Value ?? User.Identity?.Name ?? "Usuario";
+    var rol = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Sin rol";
+    var iniciales = string.Join("", nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(s => char.ToUpperInvariant(s[0])));
+    if (string.IsNullOrWhiteSpace(iniciales)) { iniciales = "US"; }
+    string Act(string c) => string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Salud Gestión</title>
+    <script>
+        (() => { try { document.documentElement.setAttribute("data-theme", localStorage.getItem("tema-sistema") || "light"); } catch { document.documentElement.setAttribute("data-theme", "light"); } })();
+    </script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SistemaCitasMedicas.styles.css" asp-append-version="true" />
+    <style>
+        :root { color-scheme: light; --app-bg:#f5f7fb; --surface:#ffffff; --surface-soft:#f8fafc; --text-main:#172033; --text-muted:#64748b; --border-color:#e5eaf1; --sidebar-bg:#0b3b49; --sidebar-accent:#0f766e; --sidebar-text:#d8e7ea; --primary:#0f766e; }
+        html[data-theme="dark"] { color-scheme: dark; --app-bg:#0b1220; --surface:#111c2e; --surface-soft:#172338; --text-main:#e5edf8; --text-muted:#9aabc2; --border-color:#29364b; --sidebar-bg:#07262f; --sidebar-accent:#14b8a6; --sidebar-text:#d8e7ea; --primary:#14b8a6; }
+        body { margin:0; background:var(--app-bg); color:var(--text-main); font-family: Inter, "Segoe UI", sans-serif; transition: background .2s ease, color .2s ease; }
+        .app-sidebar { position:fixed; inset:0 auto 0 0; width:260px; background:linear-gradient(180deg,var(--sidebar-bg),#082f3a); color:white; z-index:1040; display:flex; flex-direction:column; transition: transform .25s ease; overflow-y:auto; }
+        .app-main { min-height:100vh; margin-left:260px; }
+        .app-topbar { min-height:76px; background:var(--surface); border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; padding:0 32px; position:sticky; top:0; z-index:1000; }
+        .app-content { padding:32px; min-height:calc(100vh - 140px); }
+        .app-card { background:var(--surface); border:1px solid var(--border-color); border-radius:16px; color:var(--text-main); }
+        .app-muted { color:var(--text-muted); }
+        .sidebar-link { display:flex; align-items:center; gap:12px; padding:11px 14px; margin:3px 12px; border-radius:10px; color:var(--sidebar-text); text-decoration:none; font-size:14px; transition:.2s ease; border:0; background:transparent; width:calc(100% - 24px); text-align:left; }
+        .sidebar-link:hover, .sidebar-link.active { background:rgba(20,184,166,.18); color:white; }
+        .sidebar-link.active { box-shadow: inset 3px 0 var(--sidebar-accent); }
+        .brand-mark { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:var(--sidebar-accent); color:white; flex-shrink:0; }
+        .theme-button, .mobile-menu-button { border:1px solid var(--border-color); background:var(--surface); color:var(--text-main); border-radius:10px; padding:9px 12px; }
+        .app-footer { border-top:1px solid var(--border-color); color:var(--text-muted); padding:20px 32px; font-size:13px; }
+        html[data-theme="dark"] .table { --bs-table-bg:var(--surface); --bs-table-color:var(--text-main); --bs-table-border-color:var(--border-color); }
+        html[data-theme="dark"] .form-control, html[data-theme="dark"] .form-select { background-color:var(--surface-soft); color:var(--text-main); border-color:var(--border-color); }
+        #sidebarOverlay { display:none; }
+        .badge-programada { background:#dbeafe; color:#1d4ed8; }
+        .badge-atendida { background:#dcfce7; color:#166534; }
+        .badge-cancelada { background:#fee2e2; color:#991b1b; }
+        @@media (max-width: 991px) {
+            .app-sidebar { transform: translateX(-100%); }
+            .app-sidebar.open { transform: translateX(0); }
+            .app-main { margin-left:0; }
+            .app-content { padding:22px 16px; }
+            .app-topbar { padding:0 16px; }
+            #sidebarOverlay.show { display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1030; }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebarOverlay"></div>
+    <aside class="app-sidebar" id="appSidebar">
+        <div class="d-flex align-items-center gap-3 px-4 py-4" style="border-bottom:1px solid rgba(255,255,255,.12);">
+            <div class="brand-mark">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><path d="M8 12h8M12 8v8"/></svg>
+            </div>
+            <div>
+                <div class="fw-bold text-white">SALUD GESTIÓN</div>
+                <small style="color:#b9d7dc;">Centro de salud</small>
+            </div>
+        </div>
+        <div class="px-4 pt-4 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Menú principal</small></div>
+        <nav class="flex-grow-1 pb-2">
+            <a asp-controller="Home" asp-action="Index" class="sidebar-link @Act("Home")"><span>⌂</span><span>Dashboard</span></a>
+
+            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Gestión</small></div>
+            <a asp-controller="Pacientes" asp-action="Index" class="sidebar-link @Act("Pacientes")"><span>♙</span><span>Pacientes</span></a>
+            @if (User.IsInRole(RolesSistema.Administrador))
+            {
+                <a asp-controller="Medicos" asp-action="Index" class="sidebar-link @Act("Medicos")"><span>⚕</span><span>Médicos</span></a>
+                <a asp-controller="Especialidades" asp-action="Index" class="sidebar-link @Act("Especialidades")"><span>✚</span><span>Especialidades</span></a>
+            }
+            <a asp-controller="Citas" asp-action="Index" class="sidebar-link @Act("Citas")"><span>▦</span><span>Citas médicas</span></a>
+
+            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Sistema</small></div>
+            <a asp-controller="Reportes" asp-action="Index" class="sidebar-link @Act("Reportes")"><span>▤</span><span>Reportes</span></a>
+            @if (User.IsInRole(RolesSistema.Administrador))
+            {
+                <a asp-controller="Usuarios" asp-action="Index" class="sidebar-link @Act("Usuarios")"><span>👥</span><span>Usuarios</span></a>
+            }
+            <a asp-controller="Configuracion" asp-action="Index" class="sidebar-link @Act("Configuracion")"><span>⚙</span><span>Configuración</span></a>
+
+            <form asp-controller="Cuenta" asp-action="Logout" method="post" class="mt-2">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sidebar-link"><span>⎋</span><span>Cerrar sesión</span></button>
+            </form>
+        </nav>
+        <div class="p-3" style="border-top:1px solid rgba(255,255,255,.12);">
+            <div class="d-flex align-items-center gap-3 px-2 py-2">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:38px;height:38px;background:rgba(255,255,255,.15);color:white;"><strong>@iniciales</strong></div>
+                <div style="min-width:0;">
+                    <div class="text-white fw-semibold text-truncate" style="font-size:13px;" title="@nombreCompleto">@nombreCompleto</div>
+                    <small style="color:#b9d7dc;">@rol</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="mobile-menu-button d-lg-none" id="menuButton" aria-label="Abrir menú">☰</button>
+                <div>
+                    <div class="fw-bold" style="font-size:17px;">Sistema de Gestión Médica</div>
+                    <small class="app-muted">SALUD GESTIÓN · Administración del centro de salud</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="app-muted d-none d-md-inline" style="font-size:13px;">@nombreCompleto (@rol)</span>
+                <button type="button" class="theme-button" id="themeButton" aria-label="Cambiar tema">
+                    <span id="themeIcon">☾</span>
+                    <span class="d-none d-sm-inline" id="themeText">Modo oscuro</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="app-content">
+            @if (TempData["Mensaje"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Mensaje"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+
+        <footer class="app-footer">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <span>© 2026 Salud Gestión · Sistema de Citas Médicas</span>
+                <span>Proyecto académico · Versión 1.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        const themeButton = document.getElementById("themeButton");
+        const themeIcon = document.getElementById("themeIcon");
+        const themeText = document.getElementById("themeText");
+        function updateThemeButton() {
+            if (!themeButton || !themeIcon || !themeText) return;
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            themeIcon.textContent = isDark ? "☀" : "☾";
+            themeText.textContent = isDark ? "Modo claro" : "Modo oscuro";
+        }
+        if (themeButton) {
+            themeButton.addEventListener("click", function () {
+                const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", next);
+                try { localStorage.setItem("tema-sistema", next); } catch {}
+                updateThemeButton();
+            });
+        }
+        updateThemeButton();
+
+        const sidebar = document.getElementById("appSidebar");
+        const menuButton = document.getElementById("menuButton");
+        const overlay = document.getElementById("sidebarOverlay");
+        function closeSidebar() { if (!sidebar || !overlay) return; sidebar.classList.remove("open"); overlay.classList.remove("show"); }
+        if (menuButton && sidebar && overlay) {
+            menuButton.addEventListener("click", function () { sidebar.classList.toggle("open"); overlay.classList.toggle("show"); });
+            overlay.addEventListener("click", closeSidebar);
+            document.querySelectorAll(".app-sidebar a, .app-sidebar button[type='submit']").forEach(el => {
+                el.addEventListener("click", function () { if (window.innerWidth <= 991) closeSidebar(); });
+            });
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

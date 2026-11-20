@@ -1,0 +1,73 @@
+@model SistemaCitasMedicas.ViewModels.ReporteFiltroViewModel
+@using SistemaCitasMedicas.Datos.Entidades
+@{
+    ViewData["Title"] = "Reportes";
+    int total = ViewBag.Total ?? 0; int prog = ViewBag.Programadas ?? 0; int aten = ViewBag.Atendidas ?? 0; int canc = ViewBag.Canceladas ?? 0;
+    string qs = Context.Request.QueryString.Value ?? "";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div><h2 class="mb-1">Reportes de citas</h2><p class="app-muted mb-0">Reportes reales generados desde la base de datos SQL Server.</p></div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-success" href="@Url.Action("ExportarCsv")@qs">Exportar Excel (CSV)</a>
+    <a class="btn btn-outline-danger" href="@Url.Action("Imprimir")@qs" target="_blank">Imprimir / PDF</a>
+  </div>
+</div>
+
+<div class="app-card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">Tipo de reporte</label>
+      <select asp-for="Tipo" class="form-select" id="tipoReporte">
+        <option value="dia">Citas del día</option>
+        <option value="rango">Citas por rango de fechas</option>
+        <option value="medico">Citas por médico</option>
+        <option value="especialidad">Citas por especialidad</option>
+        <option value="paciente">Citas por paciente</option>
+        <option value="programadas">Citas programadas</option>
+        <option value="atendidas">Citas atendidas</option>
+        <option value="canceladas">Citas canceladas</option>
+      </select>
+    </div>
+    <div class="col-md-2 filtro filtro-dia filtro-rango"><label asp-for="Fecha" class="form-label">Fecha (día)</label><input asp-for="Fecha" type="date" class="form-control" /></div>
+    <div class="col-md-2 filtro filtro-rango"><label asp-for="Desde" class="form-label">Desde</label><input asp-for="Desde" type="date" class="form-control" /></div>
+    <div class="col-md-2 filtro filtro-rango"><label asp-for="Hasta" class="form-label">Hasta</label><input asp-for="Hasta" type="date" class="form-control" /></div>
+    <div class="col-md-3 filtro filtro-medico"><label class="form-label">Médico</label><select asp-for="MedicoId" class="form-select"><option value="">Seleccione</option>@foreach(var m in Model.Medicos){<option value="@m.Id">@m.NombreCompleto</option>}</select></div>
+    <div class="col-md-3 filtro filtro-especialidad"><label class="form-label">Especialidad</label><select asp-for="EspecialidadId" class="form-select"><option value="">Seleccione</option>@foreach(var e in Model.Especialidades){<option value="@e.Id">@e.Nombre</option>}</select></div>
+    <div class="col-md-3 filtro filtro-paciente"><label class="form-label">Paciente</label><select asp-for="PacienteId" class="form-select"><option value="">Seleccione</option>@foreach(var p in Model.Pacientes){<option value="@p.Id">@p.Documento - @p.NombreCompleto</option>}</select></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Generar</button></div>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="app-card p-3"><div class="app-muted small">Total</div><div class="fs-4 fw-bold">@total</div></div></div>
+  <div class="col-6 col-md-3"><div class="app-card p-3"><div class="app-muted small">Programadas</div><div class="fs-4 fw-bold text-primary">@prog</div></div></div>
+  <div class="col-6 col-md-3"><div class="app-card p-3"><div class="app-muted small">Atendidas</div><div class="fs-4 fw-bold text-success">@aten</div></div></div>
+  <div class="col-6 col-md-3"><div class="app-card p-3"><div class="app-muted small">Canceladas</div><div class="fs-4 fw-bold text-danger">@canc</div></div></div>
+</div>
+
+<div class="app-card p-0 overflow-hidden"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+<thead class="table-light"><tr><th>Fecha y hora</th><th>Paciente</th><th>Documento</th><th>Médico</th><th>Especialidad</th><th>Estado</th></tr></thead>
+<tbody>
+@if(!Model.Resultados.Any()){<tr><td colspan="6" class="text-center py-4 app-muted">No hay resultados para el filtro seleccionado.</td></tr>}
+else{foreach(var c in Model.Resultados){ var badge=c.Estado==EstadosCita.Programada?"bg-primary":c.Estado==EstadosCita.Atendida?"bg-success":"bg-secondary";<tr>
+<td>@c.FechaHora.ToString("dd/MM/yyyy HH:mm")</td><td>@c.Paciente?.NombreCompleto</td><td>@c.Paciente?.Documento</td><td>@c.Medico?.NombreCompleto</td><td>@c.Medico?.Especialidad?.Nombre</td><td><span class="badge @badge">@c.Estado</span></td>
+</tr>}}
+</tbody></table></div></div>
+
+@section Scripts {
+<script>
+(function(){
+  const tipo = document.getElementById('tipoReporte');
+  function actualizar(){
+    document.querySelectorAll('.filtro').forEach(e=>e.style.display='none');
+    const v = tipo.value;
+    if(v==='dia') document.querySelectorAll('.filtro-dia').forEach(e=>e.style.display='');
+    if(v==='rango'){ document.querySelectorAll('.filtro-rango').forEach(e=>e.style.display=''); document.querySelectorAll('.filtro-dia').forEach(e=>e.style.display='none'); }
+    if(v==='medico') document.querySelectorAll('.filtro-medico').forEach(e=>e.style.display='');
+    if(v==='especialidad') document.querySelectorAll('.filtro-especialidad').forEach(e=>e.style.display='');
+    if(v==='paciente') document.querySelectorAll('.filtro-paciente').forEach(e=>e.style.display='');
+  }
+  tipo.addEventListener('change', actualizar); actualizar();
+})();
+</script>
+}

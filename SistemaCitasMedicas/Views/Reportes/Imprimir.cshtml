@@ -1,0 +1,29 @@
+@model SistemaCitasMedicas.ViewModels.ReporteFiltroViewModel
+@using SistemaCitasMedicas.Datos.Entidades
+@{
+    Layout = null;
+    int total = ViewBag.Total ?? 0; int prog = ViewBag.Programadas ?? 0; int aten = ViewBag.Atendidas ?? 0; int canc = ViewBag.Canceladas ?? 0;
+}
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><title>Reporte de citas - SALUD GESTIÓN</title>
+<style>
+body{font-family:Arial,Segoe UI,sans-serif;margin:24px;color:#111} h1{margin:0 0 4px} .muted{color:#555}
+table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px} th,td{border:1px solid #ccc;padding:6px 8px;text-align:left} th{background:#f3f4f6}
+.totales{display:flex;gap:16px;margin-top:12px} .card{border:1px solid #ddd;border-radius:8px;padding:8px 12px}
+@@media print { .no-print{display:none} }
+</style></head><body>
+<div class="no-print" style="margin-bottom:12px"><button onclick="window.print()">Imprimir / Guardar como PDF</button></div>
+<h1>SALUD GESTIÓN</h1>
+<div class="muted">Reporte de citas médicas · Generado: @DateTime.Now.ToString("dd/MM/yyyy HH:mm") · Tipo: @Model.Tipo</div>
+<div class="totales">
+  <div class="card"><strong>Total:</strong> @total</div>
+  <div class="card"><strong>Programadas:</strong> @prog</div>
+  <div class="card"><strong>Atendidas:</strong> @aten</div>
+  <div class="card"><strong>Canceladas:</strong> @canc</div>
+</div>
+<table><thead><tr><th>Fecha y hora</th><th>Paciente</th><th>Documento</th><th>Médico</th><th>Especialidad</th><th>Estado</th></tr></thead>
+<tbody>
+@if(!Model.Resultados.Any()){<tr><td colspan="6">Sin resultados.</td></tr>}
+else{foreach(var c in Model.Resultados){<tr><td>@c.FechaHora.ToString("dd/MM/yyyy HH:mm")</td><td>@c.Paciente?.NombreCompleto</td><td>@c.Paciente?.Documento</td><td>@c.Medico?.NombreCompleto</td><td>@c.Medico?.Especialidad?.Nombre</td><td>@c.Estado</td></tr>}}
+</tbody></table>
+</body></html>

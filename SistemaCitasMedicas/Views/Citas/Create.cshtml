@@ -1,0 +1,106 @@
+@model SistemaCitasMedicas.ViewModels.CitaFormViewModel
+@using SistemaCitasMedicas.Datos.Entidades
+@{ ViewData["Title"] = "Programar cita"; }
+<h2>Programar cita médica</h2>
+<p class="app-muted">Seleccione paciente, especialidad, médico, fecha y hora. La disponibilidad se verifica en tiempo real contra la base de datos.</p>
+<hr />
+<div class="app-card p-4">
+  <form asp-action="Create" method="post" id="formCita" class="row g-3">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6">
+      <label asp-for="PacienteId" class="form-label"></label>
+      <select asp-for="PacienteId" class="form-select">
+        <option value="">Seleccione un paciente</option>
+        @foreach (var p in Model.Pacientes){<option value="@p.Id">@p.Documento - @p.NombreCompleto</option>}
+      </select>
+      <span asp-validation-for="PacienteId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label asp-for="EspecialidadId" class="form-label"></label>
+      <select asp-for="EspecialidadId" class="form-select" id="EspecialidadId">
+        <option value="">Seleccione una especialidad</option>
+        @foreach (var e in Model.Especialidades){<option value="@e.Id">@e.Nombre</option>}
+      </select>
+      <span asp-validation-for="EspecialidadId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label asp-for="MedicoId" class="form-label"></label>
+      <select asp-for="MedicoId" class="form-select" id="MedicoId">
+        <option value="">Seleccione un médico</option>
+        @foreach (var m in Model.Medicos){<option value="@m.Id">@m.NombreCompleto (@m.Matricula)</option>}
+      </select>
+      <span asp-validation-for="MedicoId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+      <label asp-for="Fecha" class="form-label"></label>
+      <input asp-for="Fecha" type="date" class="form-control" id="Fecha" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+      <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+      <label asp-for="Hora" class="form-label"></label>
+      <select asp-for="Hora" class="form-select" id="Hora"></select>
+      <span asp-validation-for="Hora" class="text-danger"></span>
+      <small id="dispMsg" class="d-block mt-1"></small>
+    </div>
+    <div class="col-12">
+      <label asp-for="Observaciones" class="form-label"></label>
+      <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+      <span asp-validation-for="Observaciones" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+      <button type="button" id="btnVerificar" class="btn btn-outline-info">Verificar disponibilidad</button>
+      <button type="submit" class="btn btn-primary">Programar cita</button>
+      <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </div>
+  </form>
+</div>
+@section Scripts {
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+<script>
+(function(){
+  const esp = document.getElementById('EspecialidadId');
+  const med = document.getElementById('MedicoId');
+  const fecha = document.getElementById('Fecha');
+  const hora = document.getElementById('Hora');
+  const msg = document.getElementById('dispMsg');
+  const btn = document.getElementById('btnVerificar');
+
+  function slots(){
+    const arr=[]; for(let h=8; h<=17; h++){ for(let m of [0,30]){ if(h===17 && m>0) continue; const hh=String(h).padStart(2,'0'); const mm=String(m).padStart(2,'0'); arr.push(hh+':'+mm); } } return arr;
+  }
+  function renderHoras(ocupados){
+    const sel = hora.value; hora.innerHTML='';
+    slots().forEach(s=>{ const o=ocupados.includes(s); const opt=document.createElement('option'); opt.value=s; opt.textContent = s + (o?' (ocupado)':''); opt.disabled=o; if(s===sel && !o) opt.selected=true; hora.appendChild(opt); });
+    if(!hora.value){ const first=[...hora.options].find(o=>!o.disabled); if(first) first.selected=true; }
+  }
+  renderHoras([]);
+
+  async function cargarMedicos(){
+    const id = esp.value; med.innerHTML='<option value="">Seleccione un médico</option>';
+    if(!id) return;
+    const res = await fetch(`@Url.Action("MedicosPorEspecialidad")?especialidadId=${id}`);
+    const data = await res.json();
+    data.forEach(m=>{ const o=document.createElement('option'); o.value=m.id; o.textContent=`${m.nombre} (${m.matricula})`; med.appendChild(o); });
+  }
+  async function cargarDisponibilidad(){
+    if(!med.value || !fecha.value){ renderHoras([]); return; }
+    const res = await fetch(`@Url.Action("Disponibilidad")?medicoId=${med.value}&fecha=${fecha.value}`);
+    const data = await res.json();
+    renderHoras(data.ocupados || []);
+  }
+  async function verificar(){
+    msg.textContent=''; msg.className='d-block mt-1';
+    if(!med.value||!esp.value||!fecha.value||!hora.value){ msg.textContent='Complete especialidad, médico, fecha y hora.'; msg.classList.add('text-warning'); return; }
+    const res = await fetch(`@Url.Action("Validar")?medicoId=${med.value}&especialidadId=${esp.value}&fecha=${fecha.value}&hora=${hora.value}`);
+    const data = await res.json();
+    msg.textContent = data.mensaje; msg.classList.add(data.ok?'text-success':'text-danger');
+  }
+  esp.addEventListener('change', async ()=>{ await cargarMedicos(); await cargarDisponibilidad(); });
+  med.addEventListener('change', cargarDisponibilidad);
+  fecha.addEventListener('change', cargarDisponibilidad);
+  btn.addEventListener('click', verificar);
+  if(esp.value){ cargarDisponibilidad(); }
+})();
+</script>
+}

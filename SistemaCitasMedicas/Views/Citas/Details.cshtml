@@ -1,0 +1,40 @@
+@model SistemaCitasMedicas.Datos.Entidades.Cita
+@using SistemaCitasMedicas.Datos.Entidades
+@{
+    ViewData["Title"] = "Detalle de cita";
+    var badge = Model.Estado==EstadosCita.Programada?"bg-primary":Model.Estado==EstadosCita.Atendida?"bg-success":"bg-secondary";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h2 class="mb-0">Detalle de cita</h2>
+  <div class="d-flex gap-2 flex-wrap">
+    @if(Model.Estado!=EstadosCita.Cancelada){<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Modificar</a>}
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+  </div>
+</div>
+<div class="app-card p-4 mb-3">
+  <dl class="row mb-0">
+    <dt class="col-sm-3">Estado</dt><dd class="col-sm-9"><span class="badge @badge">@Model.Estado</span></dd>
+    <dt class="col-sm-3">Fecha y hora</dt><dd class="col-sm-9">@Model.FechaHora.ToString("dd/MM/yyyy HH:mm")</dd>
+    <dt class="col-sm-3">Paciente</dt><dd class="col-sm-9">@Model.Paciente?.NombreCompleto (@Model.Paciente?.Documento)</dd>
+    <dt class="col-sm-3">Médico</dt><dd class="col-sm-9">@Model.Medico?.NombreCompleto (@Model.Medico?.Matricula)</dd>
+    <dt class="col-sm-3">Especialidad</dt><dd class="col-sm-9">@Model.Medico?.Especialidad?.Nombre</dd>
+    <dt class="col-sm-3">Observaciones</dt><dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Observaciones)?"-":Model.Observaciones)</dd>
+  </dl>
+</div>
+@if(Model.Estado != EstadosCita.Cancelada){
+<div class="app-card p-4">
+  <h5>Cambiar estado</h5>
+  <p class="app-muted">Estados permitidos: Programada, Atendida, Cancelada. Una cita cancelada no puede reactivarse.</p>
+  <div class="d-flex gap-2 flex-wrap">
+    @if(Model.Estado != EstadosCita.Atendida){
+      <form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id"/><input type="hidden" name="estado" value="Atendida"/><button class="btn btn-success" type="submit" onclick="return confirm('¿Marcar cita como atendida?');">Marcar como atendida</button></form>
+    }
+    @if(Model.Estado != EstadosCita.Programada){
+      <form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id"/><input type="hidden" name="estado" value="Programada"/><button class="btn btn-primary" type="submit" onclick="return confirm('¿Volver a estado programada?');">Marcar como programada</button></form>
+    }
+    <form asp-action="Cancelar" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id"/><button class="btn btn-danger" type="submit" onclick="return confirm('¿Cancelar esta cita? El horario quedará disponible.');">Cancelar cita</button></form>
+  </div>
+</div>
+} else {
+<div class="alert alert-secondary">Esta cita está cancelada y se conserva en el historial. Para un nuevo horario debe programar una nueva cita.</div>
+}

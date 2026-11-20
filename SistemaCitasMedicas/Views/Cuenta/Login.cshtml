@@ -1,0 +1,68 @@
+@model SistemaCitasMedicas.ViewModels.LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Iniciar sesión";
+    bool requiereInstalacion = ViewBag.RequiereInstalacion == true;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar sesión - SALUD GESTIÓN</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { min-height: 100vh; background: linear-gradient(135deg, #0f766e, #2563eb); display:flex; align-items:center; justify-content:center; font-family: Inter, 'Segoe UI', sans-serif; }
+        .login-card { width: 100%; max-width: 430px; border: 0; border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,.2); }
+        .brand { color:#0f766e; font-weight:800; letter-spacing:.5px; }
+    </style>
+</head>
+<body>
+    <div class="card login-card p-2">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div class="brand fs-4">SALUD GESTIÓN</div>
+                <div class="text-muted">Sistema de Gestión de Citas Médicas</div>
+            </div>
+
+            @if (TempData["Mensaje"] != null)
+            {
+                <div class="alert alert-success">@TempData["Mensaje"]</div>
+            }
+
+            @if (requiereInstalacion)
+            {
+                <div class="alert alert-warning">
+                    No hay usuarios registrados. Debe crear el administrador inicial antes de ingresar.
+                    <div class="mt-2"><a asp-action="Instalacion" class="btn btn-sm btn-warning">Crear administrador inicial</a></div>
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                <div class="mb-3">
+                    <label asp-for="NombreUsuario" class="form-label"></label>
+                    <input asp-for="NombreUsuario" class="form-control" autocomplete="username" />
+                    <span asp-validation-for="NombreUsuario" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Contrasena" class="form-label"></label>
+                    <input asp-for="Contrasena" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Contrasena" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">Iniciar sesión</button>
+            </form>
+
+            <div class="text-center mt-3 small text-muted">Acceso restringido a personal autorizado</div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

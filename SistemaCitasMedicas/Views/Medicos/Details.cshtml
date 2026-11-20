@@ -1,0 +1,10 @@
+@model SistemaCitasMedicas.Datos.Entidades.Medico
+@{ ViewData["Title"] = "Detalle del médico"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="mb-0">Detalle del médico</h2><div><a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div></div>
+<div class="app-card p-4"><dl class="row mb-0">
+<dt class="col-sm-3">Nombres</dt><dd class="col-sm-9">@Model.Nombres</dd>
+<dt class="col-sm-3">Apellidos</dt><dd class="col-sm-9">@Model.Apellidos</dd>
+<dt class="col-sm-3">Matrícula</dt><dd class="col-sm-9">@Model.Matricula</dd>
+<dt class="col-sm-3">Especialidad</dt><dd class="col-sm-9">@Model.Especialidad?.Nombre</dd>
+<dt class="col-sm-3">Estado</dt><dd class="col-sm-9">@(Model.Activo?"Activo":"Inactivo")</dd>
+</dl></div>

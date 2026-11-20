@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Configuración";
+}
+<h2 class="mb-1">Configuración del sistema</h2>
+<p class="app-muted">Información general y parámetros operativos de SALUD GESTIÓN.</p>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="app-card p-4 h-100">
+      <h5>Información del sistema</h5>
+      <dl class="row mb-0 mt-3">
+        <dt class="col-sm-5">Nombre</dt><dd class="col-sm-7">SALUD GESTIÓN</dd>
+        <dt class="col-sm-5">Módulo</dt><dd class="col-sm-7">Sistema de Gestión de Citas Médicas</dd>
+        <dt class="col-sm-5">Versión</dt><dd class="col-sm-7">@ViewBag.Version</dd>
+        <dt class="col-sm-5">Entorno</dt><dd class="col-sm-7">@ViewBag.Entorno</dd>
+        <dt class="col-sm-5">Framework</dt><dd class="col-sm-7">.NET 10 / ASP.NET Core MVC</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="app-card p-4 h-100">
+      <h5>Base de datos</h5>
+      <dl class="row mb-0 mt-3">
+        <dt class="col-sm-5">Motor</dt><dd class="col-sm-7">Microsoft SQL Server (Express)</dd>
+        <dt class="col-sm-5">Base de datos</dt><dd class="col-sm-7">@ViewBag.BaseDatos</dd>
+        <dt class="col-sm-5">Autenticación</dt><dd class="col-sm-7">Integrada de Windows</dd>
+        <dt class="col-sm-5">ORM</dt><dd class="col-sm-7">Entity Framework Core</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="app-card p-4 h-100">
+      <h5>Seguridad</h5>
+      <ul class="mb-0 mt-3">
+        <li>Autenticación por cookies con sesión protegida.</li>
+        <li>Autorización basada en roles (Administrador, Recepcionista).</li>
+        <li>Contraseñas almacenadas con hash bcrypt (no texto plano).</li>
+        <li>Protección antiforgery en formularios.</li>
+        <li>Validación de datos en servidor y cliente.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="app-card p-4 h-100">
+      <h5>Operación</h5>
+      <ul class="mb-0 mt-3">
+        <li>Los pacientes y médicos se desactivan para conservar historial.</li>
+        <li>Las citas canceladas liberan horario pero permanecen en el historial.</li>
+        <li>Se recomienda realizar copias de seguridad periódicas de <code>CitasMedicasDB</code>.</li>
+        <li>Para el primer acceso, use el procedimiento de instalación de administrador inicial.</li>
+      </ul>
+    </div>
+  </div>
+</div>

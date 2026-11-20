@@ -1,0 +1,98 @@
+﻿@model SistemaCitasMedicas.Logica.Servicios.DashboardResumen
+@using SistemaCitasMedicas.Datos.Entidades
+@{
+    ViewData["Title"] = "Panel principal";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="mb-1">Panel principal</h2>
+        <p class="app-muted mb-0">Resumen general del sistema obtenido desde SQL Server.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-controller="Pacientes" asp-action="Create" class="btn btn-primary">Nuevo paciente</a>
+        <a asp-controller="Citas" asp-action="Create" class="btn btn-success">Programar cita</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Pacientes activos</div><div class="fs-3 fw-bold">@Model.PacientesActivos</div></div></div>
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Médicos activos</div><div class="fs-3 fw-bold">@Model.MedicosActivos</div></div></div>
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Especialidades</div><div class="fs-3 fw-bold">@Model.EspecialidadesActivas</div></div></div>
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Programadas hoy</div><div class="fs-3 fw-bold text-primary">@Model.CitasProgramadasHoy</div></div></div>
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Atendidas</div><div class="fs-3 fw-bold text-success">@Model.CitasAtendidas</div></div></div>
+    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Canceladas</div><div class="fs-3 fw-bold text-danger">@Model.CitasCanceladas</div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="app-card p-3 h-100">
+            <h5 class="mb-3">Próximas citas programadas</h5>
+            @if (!Model.ProximasCitas.Any())
+            {
+                <p class="app-muted mb-0">No hay próximas citas programadas.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead><tr><th>Fecha y hora</th><th>Paciente</th><th>Médico</th></tr></thead>
+                        <tbody>
+                        @foreach (var c in Model.ProximasCitas)
+                        {
+                            <tr>
+                                <td>@c.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@c.Paciente?.NombreCompleto</td>
+                                <td>@c.Medico?.NombreCompleto</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="app-card p-3 h-100">
+            <h5 class="mb-3">Últimas citas registradas</h5>
+            @if (!Model.UltimasCitas.Any())
+            {
+                <p class="app-muted mb-0">No hay citas registradas.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead><tr><th>Fecha y hora</th><th>Paciente</th><th>Estado</th></tr></thead>
+                        <tbody>
+                        @foreach (var c in Model.UltimasCitas)
+                        {
+                            var badge = c.Estado == EstadosCita.Programada ? "bg-primary" : c.Estado == EstadosCita.Atendida ? "bg-success" : "bg-secondary";
+                            <tr>
+                                <td>@c.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@c.Paciente?.NombreCompleto</td>
+                                <td><span class="badge @badge">@c.Estado</span></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="app-card p-3 mt-4">
+    <h5 class="mb-3">Accesos rápidos</h5>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-primary">Pacientes</a>
+        <a asp-controller="Medicos" asp-action="Index" class="btn btn-outline-primary">Médicos</a>
+        <a asp-controller="Especialidades" asp-action="Index" class="btn btn-outline-primary">Especialidades</a>
+        <a asp-controller="Citas" asp-action="Index" class="btn btn-outline-primary">Citas médicas</a>
+        <a asp-controller="Reportes" asp-action="Index" class="btn btn-outline-primary">Reportes</a>
+        @if (User.IsInRole(RolesSistema.Administrador))
+        {
+            <a asp-controller="Usuarios" asp-action="Index" class="btn btn-outline-secondary">Usuarios</a>
+        }
+    </div>
+</div>
