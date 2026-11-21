@@ -84,7 +84,9 @@ namespace SistemaCitasMedicas.Datos
                     .WithMany(m => m.Citas)
                     .HasForeignKey(e => e.MedicoId)
                     .OnDelete(DeleteBehavior.Restrict);
-                entity.HasIndex(e => new { e.MedicoId, e.FechaHora });
+                entity.HasIndex(e => new { e.MedicoId, e.FechaHora })
+                    .IsUnique()
+                    .HasFilter("Estado <> 'Cancelada'");
                 entity.HasIndex(e => e.PacienteId);
                 entity.HasIndex(e => e.FechaHora);
             });

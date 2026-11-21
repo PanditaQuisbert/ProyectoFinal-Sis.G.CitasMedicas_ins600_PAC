@@ -21,81 +21,92 @@
     <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SistemaCitasMedicas.styles.css" asp-append-version="true" />
     <style>
-        :root { color-scheme: light; --app-bg:#f5f7fb; --surface:#ffffff; --surface-soft:#f8fafc; --text-main:#172033; --text-muted:#64748b; --border-color:#e5eaf1; --sidebar-bg:#0b3b49; --sidebar-accent:#0f766e; --sidebar-text:#d8e7ea; --primary:#0f766e; }
-        html[data-theme="dark"] { color-scheme: dark; --app-bg:#0b1220; --surface:#111c2e; --surface-soft:#172338; --text-main:#e5edf8; --text-muted:#9aabc2; --border-color:#29364b; --sidebar-bg:#07262f; --sidebar-accent:#14b8a6; --sidebar-text:#d8e7ea; --primary:#14b8a6; }
-        body { margin:0; background:var(--app-bg); color:var(--text-main); font-family: Inter, "Segoe UI", sans-serif; transition: background .2s ease, color .2s ease; }
-        .app-sidebar { position:fixed; inset:0 auto 0 0; width:260px; background:linear-gradient(180deg,var(--sidebar-bg),#082f3a); color:white; z-index:1040; display:flex; flex-direction:column; transition: transform .25s ease; overflow-y:auto; }
+        /* Las variables de color viven en site.css. Aquí solo estructura. */
+        .app-sidebar { position:fixed; inset:0 auto 0 0; width:260px; z-index:1040; display:flex; flex-direction:column; transition:transform .25s ease; overflow-y:auto; }
         .app-main { min-height:100vh; margin-left:260px; }
-        .app-topbar { min-height:76px; background:var(--surface); border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; padding:0 32px; position:sticky; top:0; z-index:1000; }
+        .app-topbar { min-height:76px; display:flex; align-items:center; justify-content:space-between; padding:0 32px; position:sticky; top:0; z-index:1000; }
         .app-content { padding:32px; min-height:calc(100vh - 140px); }
-        .app-card { background:var(--surface); border:1px solid var(--border-color); border-radius:16px; color:var(--text-main); }
-        .app-muted { color:var(--text-muted); }
-        .sidebar-link { display:flex; align-items:center; gap:12px; padding:11px 14px; margin:3px 12px; border-radius:10px; color:var(--sidebar-text); text-decoration:none; font-size:14px; transition:.2s ease; border:0; background:transparent; width:calc(100% - 24px); text-align:left; }
-        .sidebar-link:hover, .sidebar-link.active { background:rgba(20,184,166,.18); color:white; }
-        .sidebar-link.active { box-shadow: inset 3px 0 var(--sidebar-accent); }
-        .brand-mark { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:var(--sidebar-accent); color:white; flex-shrink:0; }
-        .theme-button, .mobile-menu-button { border:1px solid var(--border-color); background:var(--surface); color:var(--text-main); border-radius:10px; padding:9px 12px; }
-        .app-footer { border-top:1px solid var(--border-color); color:var(--text-muted); padding:20px 32px; font-size:13px; }
-        html[data-theme="dark"] .table { --bs-table-bg:var(--surface); --bs-table-color:var(--text-main); --bs-table-border-color:var(--border-color); }
-        html[data-theme="dark"] .form-control, html[data-theme="dark"] .form-select { background-color:var(--surface-soft); color:var(--text-main); border-color:var(--border-color); }
-        #sidebarOverlay { display:none; }
-        .badge-programada { background:#dbeafe; color:#1d4ed8; }
-        .badge-atendida { background:#dcfce7; color:#166534; }
-        .badge-cancelada { background:#fee2e2; color:#991b1b; }
+        .brand-mark { width:42px; height:42px; border-radius:13px; display:grid; place-items:center; flex-shrink:0; }
+        .sidebar-link { display:flex; align-items:center; gap:12px; padding:11px 14px; margin:3px 12px; border-radius:11px; font-size:14px; transition:.2s ease; border:0; background:transparent; width:calc(100% - 24px); text-align:left; }
+        .brand-section-label { color:#9fc5cc; letter-spacing:.14em; font-size:10px; }
+        .sidebar-caption { color:#b9d7dc; }
+        .sidebar-divider { border-top:1px solid rgba(255,255,255,.12); }
+        .theme-button, .mobile-menu-button { padding:9px 12px; }
+        .app-footer { border-top:1px solid var(--border-color); padding:20px 32px; font-size:13px; }
         @@media (max-width: 991px) {
-            .app-sidebar { transform: translateX(-100%); }
-            .app-sidebar.open { transform: translateX(0); }
+            .app-sidebar { transform:translateX(-100%); }
+            .app-sidebar.open { transform:translateX(0); }
             .app-main { margin-left:0; }
             .app-content { padding:22px 16px; }
             .app-topbar { padding:0 16px; }
-            #sidebarOverlay.show { display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1030; }
+            #sidebarOverlay.show { display:block; position:fixed; inset:0; background:rgba(2,6,23,.62); z-index:1030; }
         }
     </style>
 </head>
 <body>
+    <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><path d="M8 12h8M12 8v8"/></symbol>
+        <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+        <symbol id="i-patient" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></symbol>
+        <symbol id="i-doctor" viewBox="0 0 24 24"><path d="M9 3v7l-4 8a2 2 0 0 0 3.5 2L12 15l3.5 5a2 2 0 0 0 3.5-2l-4-8V3"/><path d="M8 3h8"/></symbol>
+        <symbol id="i-specialty" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+        <symbol id="i-report" viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="11" width="3" height="7" rx="1"/><rect x="11" y="6" width="3" height="12" rx="1"/><rect x="17" y="14" width="3" height="4" rx="1"/></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5"/><path d="M17 5.2a3.5 3.5 0 0 1 0 6.6M18 14.8c2.4.6 4 2.2 4 5.2"/></symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M15 16l4-4-4-4M19 12H9"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+        <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    </svg>
+
     <div id="sidebarOverlay"></div>
     <aside class="app-sidebar" id="appSidebar">
-        <div class="d-flex align-items-center gap-3 px-4 py-4" style="border-bottom:1px solid rgba(255,255,255,.12);">
-            <div class="brand-mark">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><path d="M8 12h8M12 8v8"/></svg>
-            </div>
+        <div class="d-flex align-items-center gap-3 px-4 py-4 sidebar-divider">
+            <div class="brand-mark"><svg class="ico ico-lg"><use href="#i-heart"></use></svg></div>
             <div>
                 <div class="fw-bold text-white">SALUD GESTIÓN</div>
-                <small style="color:#b9d7dc;">Centro de salud</small>
+                <small class="sidebar-caption">Centro de salud</small>
             </div>
         </div>
-        <div class="px-4 pt-4 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Menú principal</small></div>
+        <div class="px-4 pt-4 pb-2"><small class="text-uppercase fw-semibold brand-section-label">Menú principal</small></div>
         <nav class="flex-grow-1 pb-2">
-            <a asp-controller="Home" asp-action="Index" class="sidebar-link @Act("Home")"><span>⌂</span><span>Dashboard</span></a>
+            <a asp-controller="Home" asp-action="Index" class="sidebar-link @Act("Home")"><span><svg class="ico"><use href="#i-dashboard"></use></svg></span><span>Dashboard</span></a>
 
-            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Gestión</small></div>
-            <a asp-controller="Pacientes" asp-action="Index" class="sidebar-link @Act("Pacientes")"><span>♙</span><span>Pacientes</span></a>
+            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold brand-section-label">Gestión</small></div>
+            <a asp-controller="Pacientes" asp-action="Index" class="sidebar-link @Act("Pacientes")"><span><svg class="ico"><use href="#i-patient"></use></svg></span><span>Pacientes</span></a>
             @if (User.IsInRole(RolesSistema.Administrador))
             {
-                <a asp-controller="Medicos" asp-action="Index" class="sidebar-link @Act("Medicos")"><span>⚕</span><span>Médicos</span></a>
-                <a asp-controller="Especialidades" asp-action="Index" class="sidebar-link @Act("Especialidades")"><span>✚</span><span>Especialidades</span></a>
+                <a asp-controller="Medicos" asp-action="Index" class="sidebar-link @Act("Medicos")"><span><svg class="ico"><use href="#i-doctor"></use></svg></span><span>Médicos</span></a>
+                <a asp-controller="Especialidades" asp-action="Index" class="sidebar-link @Act("Especialidades")"><span><svg class="ico"><use href="#i-specialty"></use></svg></span><span>Especialidades</span></a>
             }
-            <a asp-controller="Citas" asp-action="Index" class="sidebar-link @Act("Citas")"><span>▦</span><span>Citas médicas</span></a>
+            <a asp-controller="Citas" asp-action="Index" class="sidebar-link @Act("Citas")"><span><svg class="ico"><use href="#i-calendar"></use></svg></span><span>Citas médicas</span></a>
 
-            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold" style="color:#9fc5cc; letter-spacing:1px;">Sistema</small></div>
-            <a asp-controller="Reportes" asp-action="Index" class="sidebar-link @Act("Reportes")"><span>▤</span><span>Reportes</span></a>
+            <div class="px-4 pt-3 pb-2"><small class="text-uppercase fw-semibold brand-section-label">Sistema</small></div>
+            <a asp-controller="Reportes" asp-action="Index" class="sidebar-link @Act("Reportes")"><span><svg class="ico"><use href="#i-report"></use></svg></span><span>Reportes</span></a>
             @if (User.IsInRole(RolesSistema.Administrador))
             {
-                <a asp-controller="Usuarios" asp-action="Index" class="sidebar-link @Act("Usuarios")"><span>👥</span><span>Usuarios</span></a>
+                <a asp-controller="Usuarios" asp-action="Index" class="sidebar-link @Act("Usuarios")"><span><svg class="ico"><use href="#i-users"></use></svg></span><span>Usuarios</span></a>
             }
-            <a asp-controller="Configuracion" asp-action="Index" class="sidebar-link @Act("Configuracion")"><span>⚙</span><span>Configuración</span></a>
+            <a asp-controller="Configuracion" asp-action="Index" class="sidebar-link @Act("Configuracion")"><span><svg class="ico"><use href="#i-settings"></use></svg></span><span>Configuración</span></a>
 
             <form asp-controller="Cuenta" asp-action="Logout" method="post" class="mt-2">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="sidebar-link"><span>⎋</span><span>Cerrar sesión</span></button>
+                <button type="submit" class="sidebar-link"><span><svg class="ico"><use href="#i-logout"></use></svg></span><span>Cerrar sesión</span></button>
             </form>
         </nav>
-        <div class="p-3" style="border-top:1px solid rgba(255,255,255,.12);">
+        <div class="p-3 sidebar-divider">
             <div class="d-flex align-items-center gap-3 px-2 py-2">
                 <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:38px;height:38px;background:rgba(255,255,255,.15);color:white;"><strong>@iniciales</strong></div>
                 <div style="min-width:0;">
                     <div class="text-white fw-semibold text-truncate" style="font-size:13px;" title="@nombreCompleto">@nombreCompleto</div>
-                    <small style="color:#b9d7dc;">@rol</small>
+                    <small class="sidebar-caption">@rol</small>
                 </div>
             </div>
         </div>
@@ -104,16 +115,20 @@
     <div class="app-main">
         <header class="app-topbar">
             <div class="d-flex align-items-center gap-3">
-                <button type="button" class="mobile-menu-button d-lg-none" id="menuButton" aria-label="Abrir menú">☰</button>
+                <button type="button" class="mobile-menu-button d-lg-none" id="menuButton" aria-label="Abrir menú"><svg class="ico"><use href="#i-menu"></use></svg></button>
                 <div>
                     <div class="fw-bold" style="font-size:17px;">Sistema de Gestión Médica</div>
                     <small class="app-muted">SALUD GESTIÓN · Administración del centro de salud</small>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="app-muted d-none d-md-inline" style="font-size:13px;">@nombreCompleto (@rol)</span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="clock-display d-none d-md-flex" role="status" aria-label="Fecha y hora actual en Bolivia">
+                    <span class="clock-time" id="relojHora">--:--:--</span>
+                    <span class="clock-date" id="relojFecha">Cargando fecha…</span>
+                </div>
+                <span class="app-muted d-none d-xl-inline" style="font-size:13px;">@nombreCompleto (@rol)</span>
                 <button type="button" class="theme-button" id="themeButton" aria-label="Cambiar tema">
-                    <span id="themeIcon">☾</span>
+                    <span id="themeIcon"><svg class="ico"><use href="#i-moon" id="themeIconUse"></use></svg></span>
                     <span class="d-none d-sm-inline" id="themeText">Modo oscuro</span>
                 </button>
             </div>
@@ -123,6 +138,7 @@
             @if (TempData["Mensaje"] != null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <svg class="ico ico-sm"><use href="#i-shield"></use></svg>
                     @TempData["Mensaje"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
@@ -130,6 +146,7 @@
             @if (TempData["Error"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <svg class="ico ico-sm"><use href="#i-info"></use></svg>
                     @TempData["Error"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
@@ -151,12 +168,14 @@
     <script>
         const themeButton = document.getElementById("themeButton");
         const themeIcon = document.getElementById("themeIcon");
+        const themeIconUse = document.getElementById("themeIconUse");
         const themeText = document.getElementById("themeText");
         function updateThemeButton() {
-            if (!themeButton || !themeIcon || !themeText) return;
+            if (!themeButton || !themeText) return;
             const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-            themeIcon.textContent = isDark ? "☀" : "☾";
+            if (themeIconUse) { themeIconUse.setAttribute("href", isDark ? "#i-sun" : "#i-moon"); }
             themeText.textContent = isDark ? "Modo claro" : "Modo oscuro";
+            themeButton.setAttribute("aria-label", isDark ? "Activar modo claro" : "Activar modo oscuro");
         }
         if (themeButton) {
             themeButton.addEventListener("click", function () {

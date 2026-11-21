@@ -184,6 +184,11 @@ namespace SistemaCitasMedicas.Controllers
 
         private async Task NormalizarYValidarVm(CitaFormViewModel vm, int? excluirId = null)
         {
+            if (vm.Fecha == default)
+                ModelState.AddModelError(nameof(vm.Fecha), "Debe seleccionar una fecha válida.");
+            if (vm.FechaHora == DateTime.MinValue)
+                ModelState.AddModelError(nameof(vm.Hora), "Debe seleccionar una hora válida.");
+
             // asegurar que médico corresponda a especialidad
             var medico = await _medicoServicio.ObtenerPorId(vm.MedicoId);
             if (medico != null && medico.EspecialidadId != vm.EspecialidadId)

@@ -4,30 +4,79 @@
     ViewData["Title"] = "Panel principal";
 }
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 page-header">
     <div>
-        <h2 class="mb-1">Panel principal</h2>
+        <div class="eyebrow"><svg class="ico ico-sm"><use href="#i-dashboard"></use></svg> Panel de control</div>
+        <h2 class="page-title mb-1">Panel principal</h2>
         <p class="app-muted mb-0">Resumen general del sistema obtenido desde SQL Server.</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-        <a asp-controller="Pacientes" asp-action="Create" class="btn btn-primary">Nuevo paciente</a>
-        <a asp-controller="Citas" asp-action="Create" class="btn btn-success">Programar cita</a>
+        <a asp-controller="Pacientes" asp-action="Create" class="btn btn-primary"><svg class="ico ico-sm"><use href="#i-plus"></use></svg> Nuevo paciente</a>
+        <a asp-controller="Citas" asp-action="Create" class="btn btn-success"><svg class="ico ico-sm"><use href="#i-calendar"></use></svg> Programar cita</a>
     </div>
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Pacientes activos</div><div class="fs-3 fw-bold">@Model.PacientesActivos</div></div></div>
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Médicos activos</div><div class="fs-3 fw-bold">@Model.MedicosActivos</div></div></div>
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Especialidades</div><div class="fs-3 fw-bold">@Model.EspecialidadesActivas</div></div></div>
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Programadas hoy</div><div class="fs-3 fw-bold text-primary">@Model.CitasProgramadasHoy</div></div></div>
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Atendidas</div><div class="fs-3 fw-bold text-success">@Model.CitasAtendidas</div></div></div>
-    <div class="col-6 col-xl-2"><div class="app-card p-3 h-100"><div class="app-muted small">Canceladas</div><div class="fs-3 fw-bold text-danger">@Model.CitasCanceladas</div></div></div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Pacientes activos</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-patient"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.PacientesActivos</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card stat-card--violet p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Médicos activos</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-doctor"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.MedicosActivos</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card stat-card--blue p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Especialidades</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-specialty"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.EspecialidadesActivas</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Programadas hoy</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-calendar"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.CitasProgramadasHoy</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card stat-card--success p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Atendidas</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-shield"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.CitasAtendidas</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="app-card stat-card stat-card--danger p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                <div class="stat-label">Canceladas</div>
+                <div class="stat-icon"><svg class="ico"><use href="#i-info"></use></svg></div>
+            </div>
+            <div class="stat-value">@Model.CitasCanceladas</div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
     <div class="col-lg-6">
         <div class="app-card p-3 h-100">
-            <h5 class="mb-3">Próximas citas programadas</h5>
+            <h5 class="mb-3 panel-title"><svg class="ico"><use href="#i-calendar"></use></svg> Próximas citas programadas</h5>
             @if (!Model.ProximasCitas.Any())
             {
                 <p class="app-muted mb-0">No hay próximas citas programadas.</p>
@@ -54,7 +103,7 @@
     </div>
     <div class="col-lg-6">
         <div class="app-card p-3 h-100">
-            <h5 class="mb-3">Últimas citas registradas</h5>
+            <h5 class="mb-3 panel-title"><svg class="ico"><use href="#i-report"></use></svg> Últimas citas registradas</h5>
             @if (!Model.UltimasCitas.Any())
             {
                 <p class="app-muted mb-0">No hay citas registradas.</p>
@@ -83,16 +132,19 @@
 </div>
 
 <div class="app-card p-3 mt-4">
-    <h5 class="mb-3">Accesos rápidos</h5>
+    <h5 class="mb-3 panel-title"><svg class="ico"><use href="#i-arrow"></use></svg> Accesos rápidos</h5>
     <div class="d-flex flex-wrap gap-2">
-        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-primary">Pacientes</a>
-        <a asp-controller="Medicos" asp-action="Index" class="btn btn-outline-primary">Médicos</a>
-        <a asp-controller="Especialidades" asp-action="Index" class="btn btn-outline-primary">Especialidades</a>
-        <a asp-controller="Citas" asp-action="Index" class="btn btn-outline-primary">Citas médicas</a>
-        <a asp-controller="Reportes" asp-action="Index" class="btn btn-outline-primary">Reportes</a>
+        <a asp-controller="Pacientes" asp-action="Index" class="btn btn-outline-primary"><svg class="ico ico-sm"><use href="#i-patient"></use></svg> Pacientes</a>
         @if (User.IsInRole(RolesSistema.Administrador))
         {
-            <a asp-controller="Usuarios" asp-action="Index" class="btn btn-outline-secondary">Usuarios</a>
+            <a asp-controller="Medicos" asp-action="Index" class="btn btn-outline-primary"><svg class="ico ico-sm"><use href="#i-doctor"></use></svg> Médicos</a>
+            <a asp-controller="Especialidades" asp-action="Index" class="btn btn-outline-primary"><svg class="ico ico-sm"><use href="#i-specialty"></use></svg> Especialidades</a>
+        }
+        <a asp-controller="Citas" asp-action="Index" class="btn btn-outline-primary"><svg class="ico ico-sm"><use href="#i-calendar"></use></svg> Citas médicas</a>
+        <a asp-controller="Reportes" asp-action="Index" class="btn btn-outline-primary"><svg class="ico ico-sm"><use href="#i-report"></use></svg> Reportes</a>
+        @if (User.IsInRole(RolesSistema.Administrador))
+        {
+            <a asp-controller="Usuarios" asp-action="Index" class="btn btn-outline-secondary"><svg class="ico ico-sm"><use href="#i-users"></use></svg> Usuarios</a>
         }
     </div>
 </div>

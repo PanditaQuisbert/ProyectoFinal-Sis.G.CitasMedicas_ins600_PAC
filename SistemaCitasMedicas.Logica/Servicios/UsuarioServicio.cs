@@ -68,7 +68,6 @@ namespace SistemaCitasMedicas.Logica.Servicios
                 return (false, "El rol seleccionado no es válido.");
 
             usuario.ContrasenaHash = BCrypt.Net.BCrypt.HashPassword(contrasena);
-            usuario.Activo = true;
             usuario.FechaCreacion = DateTime.Now;
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
@@ -150,7 +149,8 @@ namespace SistemaCitasMedicas.Logica.Servicios
             {
                 NombreUsuario = nombreUsuario,
                 NombreCompleto = nombreCompleto,
-                RolId = rolAdmin.Id
+                RolId = rolAdmin.Id,
+                Activo = true
             };
             return await Crear(usuario, contrasena);
         }

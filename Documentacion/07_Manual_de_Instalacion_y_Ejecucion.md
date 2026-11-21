@@ -48,7 +48,7 @@ La URL/puerto se muestra en consola (según `launchSettings.json`). Acceda desde
 4. Inicie sesión con las credenciales creadas. **No se incluyen contraseñas predeterminadas en el código fuente.**
 
 ## 6. Configuración manual (si aplica)
-- **SQL Server:** Si la instancia no es `PAOLA\SQLEXPRESS`, edite `SistemaCitasMedicas/appsettings.json` → `ConnectionStrings:DefaultConnection` con el `Server` correcto (manteniendo autenticación integrada si corresponde). Verifique conectividad con `sqlcmd -S <instancia> -E -Q "SELECT 1"`.
+- **SQL Server:** Si la instancia no es `PAOLA\SQLEXPRESS`, edite `SistemaCitasMedicas/appsettings.json` → `ConnectionStrings:ConexionSQL` con el `Server` correcto (manteniendo autenticación integrada si corresponde). Verifique conectividad con `sqlcmd -S <instancia> -E -Q "SELECT 1"`.
 - **HTTPS:** Puede usar el perfil HTTPS de `launchSettings.json` o `dotnet run --launch-profile https` si el certificado de desarrollo está configurado (`dotnet dev-certs https --trust`).
 - **Puertos en uso:** Si el puerto configurado está ocupado, ejecute con `--urls "http://localhost:5199"` (o el puerto deseado).
 

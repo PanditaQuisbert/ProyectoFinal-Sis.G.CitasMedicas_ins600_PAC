@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace SistemaCitasMedicas.Controllers
 {
@@ -19,7 +20,11 @@ namespace SistemaCitasMedicas.Controllers
         {
             ViewBag.Entorno = _env.EnvironmentName;
             ViewBag.Version = "v1.0";
-            ViewBag.BaseDatos = "CitasMedicasDB (PAOLA\\SQLEXPRESS)";
+            var cadena = _configuration.GetConnectionString("ConexionSQL") ?? string.Empty;
+            var proveedor = new SqlConnectionStringBuilder(cadena);
+            ViewBag.BaseDatos = string.IsNullOrWhiteSpace(proveedor.InitialCatalog)
+                ? "Base de datos no configurada"
+                : $"{proveedor.InitialCatalog} ({proveedor.DataSource})";
             return View();
         }
     }

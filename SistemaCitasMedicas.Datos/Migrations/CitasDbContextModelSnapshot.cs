@@ -55,7 +55,9 @@ namespace SistemaCitasMedicas.Datos.Migrations
 
                     b.HasIndex("PacienteId");
 
-                    b.HasIndex("MedicoId", "FechaHora");
+                    b.HasIndex("MedicoId", "FechaHora")
+                        .IsUnique()
+                        .HasFilter("Estado <> 'Cancelada'");
 
                     b.ToTable("Citas");
                 });

@@ -39,7 +39,9 @@
     </div>
     <div class="col-md-3">
       <label asp-for="Hora" class="form-label"></label>
-      <select asp-for="Hora" class="form-select" id="Hora"></select>
+      <select asp-for="Hora" class="form-select" id="Hora">
+        @foreach (var hora in SistemaCitasMedicas.ViewModels.CitaFormViewModel.Horarios){<option value="@hora">@hora</option>}
+      </select>
       <span asp-validation-for="Hora" class="text-danger"></span>
       <small id="dispMsg" class="d-block mt-1"></small>
     </div>
@@ -66,9 +68,8 @@
   const msg = document.getElementById('dispMsg');
   const btn = document.getElementById('btnVerificar');
 
-  function slots(){
-    const arr=[]; for(let h=8; h<=17; h++){ for(let m of [0,30]){ if(h===17 && m>0) continue; const hh=String(h).padStart(2,'0'); const mm=String(m).padStart(2,'0'); arr.push(hh+':'+mm); } } return arr;
-  }
+  const SLOTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(SistemaCitasMedicas.ViewModels.CitaFormViewModel.Horarios));
+  function slots(){ return SLOTS; }
   function renderHoras(ocupados){
     const sel = hora.value; hora.innerHTML='';
     slots().forEach(s=>{ const o=ocupados.includes(s); const opt=document.createElement('option'); opt.value=s; opt.textContent = s + (o?' (ocupado)':''); opt.disabled=o; if(s===sel && !o) opt.selected=true; hora.appendChild(opt); });
